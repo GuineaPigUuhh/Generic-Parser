@@ -1,3 +1,2 @@
 dogs=10,
-cats=10,
-pig=600
+cats=10

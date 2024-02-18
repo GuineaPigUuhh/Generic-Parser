@@ -10,5 +10,7 @@ class Main
         var content = File.getContent("testFile.txt");
         var coolParse = GenericParser.parse(content);
         trace(coolParse);
+
+        //trace(coolParse.dogs + coolParse.cats);
     }    
 }

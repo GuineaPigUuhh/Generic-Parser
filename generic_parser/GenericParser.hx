@@ -1,80 +1,54 @@
 package generic_parser;
 
+import generic_parser.utils.SimpleUtil;
+
 using StringTools;
 
 class GenericParser
 {
+	/**
+	 * transform a string into a Object
+	 * @param content
+	 */
+	public static function parse(content:String)
+	{
+		var data:Dynamic = {};
+		for (line in content.split(','))
+		{
+			line = line.trim();
+			var inVar = line.split("=");
 
+			var varName:String = inVar[0].trim();
+			var varValue:Dynamic = parseVar(inVar[1].trim());
 
-    /**
-     * transform a string into a Data
-     * @param content
-     */
-    public static function parse(content:String)
-    {
-        var data:Dynamic = {};
-        
-        var split = content.split(',');
-        for(line in split)
+			Reflect.setProperty(data, varName, varValue);
+		}
+		return data;
+	}
+
+     /**
+	 * transforms a string into other Classes
+	 * @param v Variable
+	 */
+	static function parseVar(v:String):Dynamic
+	{
+        switch (v.substring(0, v.length))
         {
-            line = line.trim();
-            var inVar = line.split("=");
-            if (inVar.length <= 1)
-                return {};
-
-            var varName:String = inVar[0].trim();
-            var varValue:Dynamic = inVar[1].trim();
-            var varType:String = indentifyType(varValue);
-
-            switch (varType)
-            {
-                default:
-                    varValue = formatVarInParse(varType, cast varValue);
-                case 'array':
-            }
-            Reflect.setProperty(data, varName, varValue);
-        }    
-
-        return data;
-    }
-    
-    static function formatVarInParse(type:String, vString:String):Dynamic {
-        switch (type)
-        {
-            case "string":
-                return vString.replace('"', '');
-            case "bool":
-                return cast (vString == "true");
-            case "number":
-                if(vString.contains("."))
-                    return cast Std.parseFloat(vString);  
-                else
-                    return cast Std.parseInt(vString);
+            // Variables
+            case 'nill': return null;
+            case 'true': return true;
+            case 'false': return false;
         }
-        trace("Error on Parse the String");
-        return vString = "Error on Parse the String";
-    }
-
-    static function indentifyType(v:Dynamic)
-    {   
-        var v_s:String = cast v;
-
-        if (v_s.startsWith('"') && v_s.endsWith('"'))
-            return "string";
-        else if (v_s == "true" || v_s == "false")
-            return "bool";
-        else if (v_s.startsWith('[') && v_s.endsWith(']'))
-            return "array";
-        else 
+        if (v.startsWith('"') && v.endsWith('"'))
+            return v.replace('"', '');
+        else if (SimpleUtil.containsArray(v,[0,1,2,3,4,5,6,7,8,9]))
         {
-            for (i in 0...9)
-            {
-                if (v_s.startsWith(Std.string(i)))
-                {
-                    return "number";
-                }    
-            }    
+            var number:Dynamic = Std.parseInt(v);
+            if (v.contains('.'))
+                number = Std.parseFloat(v);
+            return number;
         }
-        return "unknown";
-    }    
+
+        return null;
+	}
 }

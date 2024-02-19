@@ -1,2 +1,2 @@
-dogs="sex sex",
-cats=10
+dog="test=gay",
+cat="test"

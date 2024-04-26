@@ -1,2 +1,2 @@
-dog="test=gay",
-cat="test"
+name: 'GenericParser';
+author: 'GuineaPigUuhh';

@@ -6,12 +6,14 @@ using StringTools;
 
 class Parser
 {
-	public var content:String = null;
+	public var content = '';
 
-	private var charI:Int = -1;
+	private var i = -1;
 
-	private final endPrefix:String = ';';
-	private final valuePrefix:String = ':';
+	private final endPrefix = ';';
+	private final valuePrefix = ':';
+
+	public var variables:Map<String, Dynamic> = ["true" => true, "false" => false, "nil" => null];
 
 	public function new(content:String)
 	{
@@ -35,68 +37,63 @@ class Parser
 	{
 		var data:Dynamic = {};
 
-		var this_variable:String = '';
-		while (++charI <= content.length)
+		var str:String = '';
+		while (++i <= content.length)
 		{
-			var char = content.charAt(charI);
+			var char = content.charAt(i);
 
-			if (char == endPrefix)
-			{
-				this_variable = "";
-				continue;
-			}
 			if (char == valuePrefix)
 			{
-				Reflect.setProperty(data, this_variable.trim(), parseValue());
-				this_variable = "";
+				Reflect.setProperty(data, str.trim(), parseValue());
+				str = "";
 				continue;
 			}
-
-			this_variable += char;
+			str += char;
 		}
 
 		return data;
 	}
 
-	var numberRegex = ~/[0-9]/;
-
 	private function parseValue():Dynamic
 	{
-		var this_str:String = '';
+		var str:String = '';
 
-		var isString:Bool = false;
-		var stringNUM:Int = 0;
-		while (++charI <= content.length)
+		var realArray:Array<Dynamic> = [];
+		while (++i <= content.length)
 		{
-			var char = content.charAt(charI);
-			if (char == "'")
+			var char = content.charAt(i);
+
+			if (char == endPrefix)
 			{
-				stringNUM++;
-				if (stringNUM == 2)
-					isString = true;
-				continue;
+				if (content.charAt(i - 1) == ']')
+					return parseArray(str);
+				return parseLiteral(str);
 			}
-			if (stringNUM == 0 || stringNUM == 2)
-				if (char == endPrefix)
-					break;
-			this_str += char;
+			str += char;
 		}
-
-		if (isString)
-			return this_str.trim();
-
-		var lown = this_str.toLowerCase().trim();
-		if (lown == "true")
-			return true;
-		else if (lown == "false")
-			return false;
-
-		if (lown == "nil")
-			return null;
-
-		if (numberRegex.match(this_str))
-			return Std.parseFloat(this_str);
-
 		return null;
+	}
+
+	var numberRegex = ~/[0-9]/;
+
+	private function parseLiteral(str:String):Dynamic
+	{
+		str = str.trim();
+
+		if (variables.exists(str))
+			return variables.get(str);
+		if ((str.charAt(0) == '"' || str.charAt(0) == "'") && str.charAt(str.length - 1) == str.charAt(0))
+			return str.substr(1, str.length - 2);
+		if (numberRegex.match(str))
+			return Std.parseFloat(str);
+
+		return str;
+	}
+
+	private function parseArray(str:String):Array<Dynamic>
+	{
+		str = str.trim();
+		var strList = str.substr(1, str.length - 2).split(',');
+		return [for (i in strList) parseLiteral(i)];
 	}
 }

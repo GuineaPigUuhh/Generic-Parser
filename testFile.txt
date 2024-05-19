@@ -1,2 +1,8 @@
-name: 'GenericParser';
-author: 'GuineaPigUuhh';
+string: "Test";
+boolean: true;
+number: 500;
+list: [
+        "Test",
+        true,
+        500
+    ];

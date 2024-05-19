@@ -1,4 +1,3 @@
-import sys.io.File;
 import generic_parser.GenericParser;
 
 class Test

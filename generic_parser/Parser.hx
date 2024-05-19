@@ -58,15 +58,11 @@ class Parser
 	{
 		var str:String = '';
 
-		var realArray:Array<Dynamic> = [];
 		while (++i <= content.length)
 		{
 			var char = content.charAt(i);
-
 			if (char == endPrefix)
-			{
 				return parseLiteral(str);
-			}
 			str += char;
 		}
 		return null;
@@ -78,12 +74,18 @@ class Parser
 	{
 		str = str.trim();
 
-		if (str.charAt(0) == '[')
-			return parseArray(str);
+		switch (str.charAt(0))
+		{
+			case '[':
+				return parseArray(str);
+			case '{':
+				return parseObject(str);
+			case '"', "'":
+				if (str.charAt(str.length - 1) == str.charAt(0))
+					return str.substr(1, str.length - 2);
+		}
 		if (variables.exists(str))
 			return variables.get(str);
-		if ((str.charAt(0) == '"' || str.charAt(0) == "'") && str.charAt(str.length - 1) == str.charAt(0))
-			return str.substr(1, str.length - 2);
 		if (numberRegex.match(str))
 			return Std.parseFloat(str);
 
@@ -94,6 +96,36 @@ class Parser
 	{
 		str = str.trim();
 		var strList = str.substr(1, str.length - 2).split(',');
-		return [for (i in strList) parseLiteral(i)];
+		return [for (v in strList) parseLiteral(v)];
+	}
+
+	private function parseObject(str:String):Dynamic
+	{
+		str = str.trim().substr(1, str.length - 2);
+		var object = {};
+
+		var coluns = str.split(',');
+		for (c in coluns)
+		{
+			var io = -1;
+			var word = '', old = '';
+			while (++io <= c.length)
+			{
+				var char = c.charAt(io);
+				if (char == ':')
+				{
+					old = word;
+					word = '';
+					continue;
+				}
+				word += char;
+				if (io == c.length)
+				{
+					Reflect.setProperty(object, old.trim(), parseLiteral(word));
+				}
+			}
+		}
+
+		return object;
 	}
 }

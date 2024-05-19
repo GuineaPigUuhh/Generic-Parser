@@ -1,6 +1,7 @@
 string: "Test";
 boolean: true;
 number: 500;
+object: { name: "PC", price: 200 };
 list: [
         "Test",
         true,

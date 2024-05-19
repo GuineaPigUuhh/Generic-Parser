@@ -120,9 +120,7 @@ class Parser
 				}
 				word += char;
 				if (io == c.length)
-				{
 					Reflect.setProperty(object, old.trim(), parseLiteral(word));
-				}
 			}
 		}
 

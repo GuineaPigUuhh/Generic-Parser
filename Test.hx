@@ -4,14 +4,9 @@ class Test
 {
 	static function main()
 	{
-		var data:Dynamic = GenericParser.parseFile('testFile.txt');
+		var data:Dynamic = GenericParser.parseFile('file.txt');
 
 		for (i in Reflect.fields(data))
-		{
-			var v = Reflect.getProperty(data, i);
-			Sys.println('$i = $v');
-		}
-		trace(data.object.name);
-		trace(data.object.price / 2);
+			Sys.println('$i: ${Reflect.getProperty(data, i)}');
 	}
 }

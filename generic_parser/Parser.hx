@@ -65,8 +65,6 @@ class Parser
 
 			if (char == endPrefix)
 			{
-				if (content.charAt(i - 1) == ']')
-					return parseArray(str);
 				return parseLiteral(str);
 			}
 			str += char;
@@ -80,6 +78,8 @@ class Parser
 	{
 		str = str.trim();
 
+		if (str.charAt(0) == '[')
+			return parseArray(str);
 		if (variables.exists(str))
 			return variables.get(str);
 		if ((str.charAt(0) == '"' || str.charAt(0) == "'") && str.charAt(str.length - 1) == str.charAt(0))
